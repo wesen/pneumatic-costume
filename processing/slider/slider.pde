@@ -14,7 +14,7 @@
  *     http://www.sojamo.de/libraries/controlP5/
  *   A connected Arduino running "Slider Serial - Arduino"
  *     http://principialabs.com/arduino-processing-serial-communication
- *  
+ *
  * GET HELP:
  *   Installing libraries in Processing
  *     http://www.learningprocessing.com/tutorials/libraries/
@@ -34,21 +34,24 @@ import processing.serial.*;
 ControlP5 controlP5;
 Serial serial;
 
+PneumaticProtocolDecoder decoder;
+
 void setup() {
+  decoder = new PneumaticProtocolDecoder();
   // Draw the GUI window
   size(400,350);
-  
+
   // =======================================================
   //            SERIAL COMMUNICATION SETUP:
   // =======================================================
-  
+
   // CHANGE THE FOLLOWING VARIABLE to match the port
   // to which your Arduino is connected.
-  
+
   // SEE THE LIST of available ports in the black debugging
   // section at the bottom of the Processing window. (It will
   // appear after the first time you run the sketch.
-  
+
   // THE LIST LOOKS LIKE THIS on Windows:
   //   [0] "COM1"
   //   [1] "COM3"
@@ -56,21 +59,21 @@ void setup() {
   // or like this on a Mac:
   //   [0] "/dev/tty.usbserial-somenumbers"
   //   [1] "/dev/tty.usbserial-othernumbers"
-  //   [3]  etc... 
-  
+  //   [3]  etc...
+
   // TYPE THE NUMBER (inside the brackets) of the desired
   // port after the equals sign.
-  
+
   int serialPortNumber = 0;
-  
+
   // =======================================================
-  
+
   println(Serial.list());
   String port = Serial.list()[serialPortNumber];
   serial = new Serial(this, port, 115200);
-  
+
   // Add a vertical slider control
-  controlP5 = new ControlP5(this); 
+  controlP5 = new ControlP5(this);
   //("SLIDERNAME", min,max, startpos, xpos,ypos, width,height);
   controlP5.addSlider("LED",200,230, 50, 190,50, 20,200);
   // Configure the slider properties
@@ -81,13 +84,13 @@ void setup() {
   s1.snapToTickMarks(false);
 }
 
+
 void draw() {
   background(0);
-    if (serial.available() > 0) {
-    int foo = serial.read();
-    println("serial: " + foo);
+  while (serial.available() > 0) {
+    byte b = (byte)serial.read();
+    decoder.handleByte(b);
   }
-
 }
 
 int prevValue = 0;
@@ -98,12 +101,8 @@ void LED(float LEDvalue) {
     serial.write(0xF0);
     serial.write(1);
     serial.write((LEDbrightness >> 7) & 0x7F);
-    serial.write((LEDbrightness & 0x7F);
+    serial.write((LEDbrightness & 0x7F));
     println(LEDbrightness);
     prevValue = LEDbrightness;
-  } 
-  // uncomment the following line to debug
-  //println("LED: "+ LEDbrightness);
+  }
 }
-
-
