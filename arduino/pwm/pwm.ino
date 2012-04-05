@@ -47,6 +47,7 @@
 
 class System {
 public:
+  bool active;
   int systemNumber; // number of system
   int pressure; // current pressure of system
   int goalPressure; // pressure that needs to be attained
@@ -57,7 +58,8 @@ public:
   int inflatePin, deflatePin, pressurePin;
 
   System(const int _num, const int _inflatePin, const int _deflatePin, const int _pressurePin) :
-    systemNumber(_num), inflatePin(_inflatePin), deflatePin(_deflatePin) {
+    systemNumber(_num), inflatePin(_inflatePin), deflatePin(_deflatePin), pressurePin(_pressurePin) {
+    active = false;
   }
 
   void init() {
@@ -78,6 +80,9 @@ public:
    * This is done via hysteresis.
    **/
   void tick() {
+    if (!active) {
+      return;
+    }
     pressure = analogRead(pressurePin);
     if (isRising) {
       if (pressure < goalPressure) {
@@ -108,18 +113,20 @@ public:
   }
 
   /**
-   * Set the goal pressure and sample to adjust the system immediately
+   * Set the goal pressure
    **/
   void setGoalPressure(const int _goalPressure) {
     goalPressure = _goalPressure;
     isRising = true;
-    tick();
   }
 
   /**
    * Send the current pressure
    **/
   void printPressure() {
+    if (!active) {
+      return;
+    }
     Serial.write(COMMAND_PRINT_PRESSURE);
     Serial.write(systemNumber);
     Serial.write((pressure >> 7) & 0x7F);
@@ -167,7 +174,7 @@ public:
         status = IDLE;
       } else {
         msgBytesLeft = cmdBytes[cmd];
-        if (msgBytesLeft == 0) {
+        if (msgBytesLeft == 0 || msgBytesLeft > sizeof(buf)) {
           // handle ignored commands
           status = IDLE;
         }
@@ -195,7 +202,7 @@ public:
   }
 
   void handleCommand() {
-    switch (cmd) {
+    switch (cmd | 0xF0) {
     case COMMAND_SET_GOAL_PRESSURE:
       {
         int pressure = buf[1] << 7 | buf[2];
@@ -205,6 +212,7 @@ public:
         }
         systems[systemNumber].setGoalPressure(pressure);
       }
+      break;
 
     default:
       // ignore unknown commands
@@ -222,6 +230,8 @@ void setup() {
   }
 
   Serial.begin(115200);
+
+  systems[0].active = true;
 }
 
 static int cnt = 0;
@@ -231,6 +241,7 @@ void loop() {
     for (byte i = 0; i < countof(systems); i++) {
       systems[i].printPressure();
     }
+    delay(200);
   }
 
   while (Serial.available()) {
