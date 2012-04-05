@@ -1,27 +1,40 @@
+import java.util.*;
+
 public class PneumaticProtocolDecoder {
+  public interface CommandHandler {
+    public void handleCommand(int command, byte buf[]);
+  }
+
   protected static final int STATE_IDLE = 0;
   protected static final int STATE_CMD_BYTE_RECVD = 1;
+  protected static final int STATE_CMD_PRINT_MESSAGE = 2;
   protected int status;
   protected int msgBytesLeft;
   protected int bufIndex;
+
+  protected CommandHandler handler;
 
   private static final int CMD_BYTES_LEFT[] = {
     0, // dummy, ignore
     0, // set pressure, ignore
     3, // print pressure
+    0, // print message
   };
 
-  public static final int COMMAND_SET_GOAL_PRESSURE = 0xf1;
-  public static final int COMMAND_PRINT_PRESSURE = 0xf2;
+  public static final int COMMAND_SET_GOAL_PRESSURE = 0x81;
+  public static final int COMMAND_PRINT_PRESSURE = 0x82;
+  public static final int COMMAND_PRINT_MESSAGE = 0x83;
+  public static final int COMMAND_PRINT_NUMBER = 0x84;
 
   int cmd;
   byte buf[];
 
-  public PneumaticProtocolDecoder() {
+  public PneumaticProtocolDecoder(CommandHandler _handler) {
     status = STATE_IDLE;
     bufIndex = 0;
     msgBytesLeft = 0;
-    buf = new byte[8];
+    buf = new byte[256];
+    this.handler = _handler;
   }
 
   public void handleByte(final byte b) {
@@ -39,6 +52,9 @@ public class PneumaticProtocolDecoder {
           // handle ignored commands
           status = STATE_IDLE;
         }
+        if ((cmd | 0x80) == COMMAND_PRINT_MESSAGE) {
+          status = STATE_CMD_PRINT_MESSAGE;
+        }
       }
     } else {
       switch (status) {
@@ -55,6 +71,20 @@ public class PneumaticProtocolDecoder {
         }
         break;
 
+      case STATE_CMD_PRINT_MESSAGE:
+        buf[bufIndex] = b;
+        if (bufIndex >= 1) {
+          if (b == 0 || bufIndex >= (buf.length - 1)) {
+            buf[bufIndex] = 0;
+            handleCommand();
+            status = STATE_IDLE;
+            return;
+          }
+        }
+
+        bufIndex++;
+        break;
+
       default:
         status = STATE_IDLE;
         break;
@@ -63,20 +93,10 @@ public class PneumaticProtocolDecoder {
   }
 
   public void handleCommand() {
-    switch (cmd | 0xF0) {
-    case COMMAND_SET_GOAL_PRESSURE:
-      break;
-
-    case COMMAND_PRINT_PRESSURE:
-      {
-        int pressure = buf[1] << 7 | buf[2];
-        byte systemNumber = buf[0];
-        System.out.println("system " + systemNumber + " pressure: " + pressure);
-      }
-      break;
-
-    default:
-      break;
+    byte _buf[] = new byte[bufIndex];
+    for (int i = 0; i < bufIndex; i++) {
+      _buf[i] = buf[i];
     }
+    handler.handleCommand(cmd, _buf);
   }
 };

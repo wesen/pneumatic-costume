@@ -45,6 +45,12 @@
  **/
 #define COMMAND_PRINT_PRESSURE COMMAND_BYTE(2)
 
+#define COMMAND_PRINT_MESSAGE COMMAND_BYTE(3)
+
+#define COMMAND_PRINT_NUMBER COMMAND_BYTE(4)
+
+#define COMMAND_PRINT_STATUS COMMAND_BYTE(5)
+
 class System {
 public:
   bool active;
@@ -120,17 +126,69 @@ public:
     isRising = true;
   }
 
+  void debugStatus() {
+    if (!active) {
+      printMessage("inactive");
+      return;
+    }
+
+    printMessage("pressure");
+    printPressure();
+    printMessage("goalPressure");
+    printNumber(goalPressure);
+    if (isRising) {
+      printMessage("rising");
+    }
+
+    if (inflateVentil) {
+      printMessage("inflate");
+    }
+    if (deflateVentil) {
+      printMessage("deflate");
+    }
+  }
+
+  void printStatus() {
+    Serial.write(COMMAND_PRINT_STATUS);
+    Serial.write(systemNumber);
+    byte _status = 0;
+    if (isRising) {
+      _status |= 1;
+    }
+    if (inflateVentil) {
+      _status |= (1 << 1);
+    }
+    if (deflateVentil) {
+      _status |= (1 << 2);
+    }
+    Serial.write(_status);
+  }
+
   /**
    * Send the current pressure
    **/
   void printPressure() {
-    if (!active) {
-      return;
-    }
     Serial.write(COMMAND_PRINT_PRESSURE);
     Serial.write(systemNumber);
     Serial.write((pressure >> 7) & 0x7F);
     Serial.write(pressure & 0x7F);
+  }
+
+  void printNumber(int number) {
+    Serial.write(COMMAND_PRINT_NUMBER);
+    Serial.write(systemNumber);
+    Serial.write((number >> 7) & 0x7F);
+    Serial.write(number & 0x7F);
+  }
+
+  void printMessage(char const *msg) {
+    Serial.write(COMMAND_PRINT_MESSAGE);
+    Serial.write(systemNumber);
+    char const *ptr = msg;
+    while (*ptr != 0) {
+      Serial.write(*ptr++);
+    }
+    Serial.write((byte)0);
   }
 };
 
@@ -202,7 +260,7 @@ public:
   }
 
   void handleCommand() {
-    switch (cmd | 0xF0) {
+    switch (cmd | 0x80) {
     case COMMAND_SET_GOAL_PRESSURE:
       {
         int pressure = buf[1] << 7 | buf[2];
@@ -236,12 +294,16 @@ void setup() {
 
 static int cnt = 0;
 void loop() {
-  if (cnt++ > 1000) {
+  if (cnt++ >= 10000) {
     cnt = 0;
     for (byte i = 0; i < countof(systems); i++) {
-      systems[i].printPressure();
+      systems[i].printStatus();
     }
-    delay(200);
+    delay(20);
+  }
+
+  if (cnt % 200 == 0) {
+    systems[0].printPressure();
   }
 
   while (Serial.available()) {
