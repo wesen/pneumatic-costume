@@ -57,6 +57,8 @@ public:
   int systemNumber; // number of system
   int pressure; // current pressure of system
   int goalPressure; // pressure that needs to be attained
+  int lowThreshold;
+  int highThreshold;
   bool isRising; // are we currently inflating
   bool inflateVentil; // status of the inflate ventil
   bool deflateVentil; // status of the deflate ventil
@@ -76,6 +78,8 @@ public:
     // pressure sensor analog input
     pinMode(pressurePin, INPUT);
     goalPressure = pressure = analogRead(pressurePin);
+    lowThreshold = goalPressure - 3;
+    highThreshold = goalPressure;
     isRising = false;
     inflateVentil = false;
     deflateVentil = false;
@@ -83,33 +87,26 @@ public:
 
   /**
    * Read in the current pressure, and adjust ventil according to goal pressure.
-   * This is done via hysteresis.
    **/
   void tick() {
     if (!active) {
       return;
     }
-    pressure = analogRead(pressurePin);
-    if (isRising) {
-      if (pressure < goalPressure) {
-        inflateVentil = true;
-      } else {
-        isRising = false;
-        inflateVentil = false;
-      }
-    } else {
+
+    int newPressure = analogRead(pressurePin);
+    pressure = ((pressure * 5) + newPressure) / 6;
+
+    if (pressure > lowThreshold) {
+      isRising = false;
       inflateVentil = false;
-    }
-
-
-    if (!isRising) {
-      if (pressure < (goalPressure - PRESSURE_HYSTERESIS)) {
-        deflateVentil = false;
-        isRising = true;
-      } else {
-        deflateVentil = true;
-      }
+      deflateVentil = true;
+    } else if (highThreshold > pressure) {
+      isRising = true;
+      inflateVentil = true;
+      deflateVentil = false;
     } else {
+      isRising = false;
+      inflateVentil = false;
       deflateVentil = false;
     }
 
@@ -123,6 +120,13 @@ public:
    **/
   void setGoalPressure(const int _goalPressure) {
     goalPressure = _goalPressure;
+    if (goalPressure >= pressure) {
+      highThreshold = goalPressure;
+      lowThreshold = goalPressure + 3;
+    } else {
+      highThreshold = goalPressure - 3;
+      lowThreshold = goalPressure;
+    }
     isRising = true;
   }
 
@@ -133,7 +137,7 @@ public:
     }
 
     printMessage("pressure");
-    printPressure();
+    printNumber(pressure);
     printMessage("goalPressure");
     printNumber(goalPressure);
     if (isRising) {
@@ -290,20 +294,31 @@ void setup() {
   Serial.begin(115200);
 
   systems[0].active = true;
+  systems[1].active = true;
+
+  systems[0].printMessage("Booting up system");
+  systems[1].printMessage("Booting up system");
+
 }
 
 static int cnt = 0;
+
 void loop() {
   if (cnt++ >= 10000) {
     cnt = 0;
     for (byte i = 0; i < countof(systems); i++) {
-      systems[i].printStatus();
+      systems[i].debugStatus();
     }
-    delay(20);
+    delay(2);
   }
 
   if (cnt % 200 == 0) {
-    systems[0].printPressure();
+    for (byte i = 0; i < countof(systems); i++) {
+      if (systems[i].active) {
+        systems[i].printPressure();
+        systems[i].printStatus();
+      }
+    }
   }
 
   while (Serial.available()) {

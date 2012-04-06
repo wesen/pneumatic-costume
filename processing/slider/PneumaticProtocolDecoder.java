@@ -19,12 +19,15 @@ public class PneumaticProtocolDecoder {
     0, // set pressure, ignore
     3, // print pressure
     0, // print message
+    3, // print number
+    2  // print status
   };
 
   public static final int COMMAND_SET_GOAL_PRESSURE = 0x81;
   public static final int COMMAND_PRINT_PRESSURE = 0x82;
   public static final int COMMAND_PRINT_MESSAGE = 0x83;
   public static final int COMMAND_PRINT_NUMBER = 0x84;
+  public static final int COMMAND_PRINT_STATUS = 0x85;
 
   int cmd;
   byte buf[];
