@@ -13,6 +13,8 @@
 
 import controlP5.*;
 import processing.serial.*;
+import rwmidi.*;
+MidiInput input;
 
 public final int P_REIFEN = 230;
 
@@ -55,6 +57,15 @@ void setup() {
   println(Serial.list());
   String port = Serial.list()[serialPortNumber];
   serial = new Serial(this, port, 115200);
+
+
+  String inputDeviceNames[] = RWMidi.getInputDeviceNames();
+  for (int i = 0; i < inputDeviceNames.length; i++) {
+    println(i + ": " + inputDeviceNames[i]);
+  }
+
+  input = RWMidi.getInputDevices()[0].createInput(this);
+
   ControlP5 controlP5 = new ControlP5(this);
 
   systems = new PneumaticSystem[2];
@@ -75,5 +86,17 @@ void draw() {
   while (serial.available() > 0) {
     byte b = (byte)serial.read();
     decoder.handleByte(b);
+  }
+}
+
+void controllerChangeReceived(rwmidi.Controller cc) {
+  int _cc = cc.getCC();
+  if (_cc < 5) {
+    return;
+  }
+  int _val = cc.getValue();
+  int _system = _cc - 5;
+  if (_system < systems.length) {
+    systems[_system].setPressure((int)(map(_val, 0, 127, PneumaticSystem.P_ATMOSPHERE, systems[_system].maxPressure)));
   }
 }

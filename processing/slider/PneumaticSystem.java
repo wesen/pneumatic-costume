@@ -3,7 +3,7 @@ import processing.serial.*;
 import controlP5.*;
 
 class PneumaticSystem {
-  public final int P_ATMOSPHERE = 200;
+  public static final int P_ATMOSPHERE = 190;
 
   public int number;
   public int maxPressure;
@@ -63,6 +63,7 @@ class PneumaticSystem {
     serial.write(number);
     serial.write((pressure >> 7) & 0x7f);
     serial.write((pressure & 0x7f));
+    slider.setValue(pressure);
   }
 
   public void printPressure(int pressure) {
