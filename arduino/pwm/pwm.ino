@@ -59,7 +59,8 @@ public:
   int goalPressure; // pressure that needs to be attained
   int lowThreshold;
   int highThreshold;
-  bool isRising; // are we currently inflating
+
+  bool isReaching; // are we currently inflating
   bool inflateVentil; // status of the inflate ventil
   bool deflateVentil; // status of the deflate ventil
 
@@ -77,10 +78,11 @@ public:
     pinMode(deflatePin, OUTPUT);
     // pressure sensor analog input
     pinMode(pressurePin, INPUT);
+
     goalPressure = pressure = analogRead(pressurePin);
     lowThreshold = goalPressure - 3;
     highThreshold = goalPressure;
-    isRising = false;
+    isReaching = false;
     inflateVentil = false;
     deflateVentil = false;
   }
@@ -96,18 +98,24 @@ public:
     int newPressure = analogRead(pressurePin);
     pressure = ((pressure * 5) + newPressure) / 6;
 
-    if (pressure > lowThreshold) {
-      isRising = false;
-      inflateVentil = false;
-      deflateVentil = true;
-    } else if (highThreshold > pressure) {
-      isRising = true;
-      inflateVentil = true;
-      deflateVentil = false;
+  again:
+    if (isReaching) {
+      if (pressure == goalPressure) {
+        isReaching = false;
+        inflateVentil = false;
+        deflateVentil = false;
+      } else if (pressure < goalPressure) {
+        inflateVentil = true;
+        deflateVentil = false;
+      } else if (pressure > goalPressure) {
+        inflateVentil = false;
+        deflateVentil = true;
+      }
     } else {
-      isRising = false;
-      inflateVentil = false;
-      deflateVentil = false;
+      if (pressure > lowThreshold || pressure > highThreshold) {
+        isReaching = true;
+        goto again;
+      }
     }
 
     // set the status of the ventils
@@ -127,7 +135,7 @@ public:
       highThreshold = goalPressure - 3;
       lowThreshold = goalPressure;
     }
-    isRising = true;
+    isReaching = true;
   }
 
   void debugStatus() {
@@ -140,8 +148,8 @@ public:
     printNumber(pressure);
     printMessage("goalPressure");
     printNumber(goalPressure);
-    if (isRising) {
-      printMessage("rising");
+    if (isReaching) {
+      printMessage("reaching");
     }
 
     if (inflateVentil) {
@@ -156,7 +164,7 @@ public:
     Serial.write(COMMAND_PRINT_STATUS);
     Serial.write(systemNumber);
     byte _status = 0;
-    if (isRising) {
+    if (isReaching) {
       _status |= 1;
     }
     if (inflateVentil) {
