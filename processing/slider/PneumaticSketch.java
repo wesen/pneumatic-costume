@@ -46,11 +46,17 @@ public class PneumaticSketch extends PApplet {
 
     serial = null;
 
+    // Add additional systems here, adjust the total number of systems
+    // for example:
+    // systems = new PneumaticSystem[4];
     systems = new PneumaticSystem[2];
+
     systems[0] = new PneumaticSystem(parent, controlP5, serial, "ARME", 0, P_REIFEN);
     systems[1] = new PneumaticSystem(parent, controlP5, serial, "KIEMEN", 1, P_REIFEN);
-    decoder = new PneumaticProtocolDecoder(new PneumaticCommandDispatcher(systems));
+    // systems[3] = new PneumaticSystem(parent, controlP5, serial, "FOOBAR", 2, 240);
+    // systems[4] = new PneumaticSystem(parent, controlP5, serial, "NAME", 3, 240);
 
+    decoder = new PneumaticProtocolDecoder(new PneumaticCommandDispatcher(systems));
     midiDispatcher = new PneumaticMidiDispatcher(systems);
   }
 

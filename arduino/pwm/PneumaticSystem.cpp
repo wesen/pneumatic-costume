@@ -62,7 +62,6 @@ void PneumaticSystem::tick() {
   } else {
   again:
     if (isReaching) {
-      printMessage("is Reaching");
       if (_pressure == goalPressure) {
         isReaching = false;
         inflateVentil = false;
@@ -75,10 +74,12 @@ void PneumaticSystem::tick() {
         deflateVentil = true;
       }
     } else {
+      /*
       printMessage("low, high, _pressure");
       printNumber(lowThreshold);
       printNumber(highThreshold);
       printNumber(_pressure);
+      */
       if (_pressure < lowThreshold || _pressure > highThreshold) {
         printMessage("adjust");
         isReaching = true;
