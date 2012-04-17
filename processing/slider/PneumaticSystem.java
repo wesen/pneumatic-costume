@@ -5,20 +5,21 @@ import controlP5.*;
 class PneumaticSystem {
   public static final int P_ATMOSPHERE = 190;
 
-  public int number;
-  public int maxPressure;
+  public int    number;
+  public int    maxPressure;
   public String name;
 
-  protected PApplet applet;
+  protected PApplet   applet;
   protected ControlP5 controlP5;
-  protected Serial serial;
+  protected Serial    serial;
   protected Textlabel pressureLabel;
-  protected Slider slider;
+  protected Slider    slider;
 
   protected int xPos;
   protected int top;
   protected int bottom;
   protected int height;
+  protected static final int LEFT = 170;
 
   protected int prevPressure;
 
@@ -30,13 +31,13 @@ class PneumaticSystem {
     name = _name;
     maxPressure = _maxPressure;
 
-    xPos = 140;
+    xPos = LEFT + xPos;
     height = 130;
 
     prevPressure = 0;
 
-    slider = controlP5.addSlider(name, P_ATMOSPHERE, maxPressure, 50, 30 + number * height, 20, 100);
-    pressureLabel = controlP5.addTextlabel("DRUCK_L_" + number, "200", 20, 140 + number * height);
+    slider = controlP5.addSlider(name, P_ATMOSPHERE, maxPressure, LEFT + 30, 30 + number * height, 20, 100);
+    pressureLabel = controlP5.addTextlabel("DRUCK_L_" + number, "200", LEFT, 140 + number * height);
     slider.setSliderMode(Slider.FLEXIBLE);
     slider.setNumberOfTickMarks(21);
     slider.showTickMarks(true);
@@ -48,7 +49,7 @@ class PneumaticSystem {
 
   public void draw() {
     applet.fill(0);
-    applet.rect(20, top, 100, height);
+    applet.rect(LEFT, top, 100, height);
 
     int pressure = applet.round(slider.value());
     if (pressure != prevPressure) {
@@ -59,10 +60,15 @@ class PneumaticSystem {
   }
 
   public void setPressure(int pressure) {
-    serial.write(0x81);
-    serial.write(number);
-    serial.write((pressure >> 7) & 0x7f);
-    serial.write((pressure & 0x7f));
+    if (serial != null) {
+      serial.write(0x81);
+      serial.write(number);
+      serial.write((pressure >> 7) & 0x7f);
+      serial.write((pressure & 0x7f));
+    } else {
+      applet.println("No serial interface selected");
+    }
+
     slider.setValue(pressure);
   }
 
@@ -70,16 +76,16 @@ class PneumaticSystem {
     //        System.out.println("system " + systemNumber + " pressure: " + pressure);
     pressureLabel.setValue("" + pressure);
 
-    int y = (int)applet.constrain(applet.map(pressure, P_ATMOSPHERE, maxPressure, 0, 98), 0, 98);
+    int y = (int) applet.constrain(applet.map(pressure, P_ATMOSPHERE, maxPressure, 0, 98), 0, 98);
 
     // draw the line:
-    applet.stroke(127,34,255);
+    applet.stroke(127, 34, 255);
     applet.line(xPos, bottom, xPos, bottom - y);
 
     // at the edge of the screen, go back to the beginning:
     if (xPos >= applet.width) {
-      xPos = 140;
-      applet.rect(60, top, applet.width, height);
+      xPos = LEFT + 20;
+      applet.rect(LEFT + 40, top, applet.width, height);
     } else {
       // increment the horizontal position:
       xPos++;
@@ -111,5 +117,9 @@ class PneumaticSystem {
 
     //        System.out.println("system " + systemNumber + " status " + (isRising ? "rising" : "") + " "
     //                 + (inflateVentil ? "inflate" : "") + " " + (deflateVentil ? "deflate" : ""));
+  }
+
+  public void setSerial(Serial serial) {
+    this.serial = serial;
   }
 }
