@@ -26,7 +26,10 @@ void setup() {
 
   Serial.begin(115200);
 
-  TCCR3B = (TCCR3B & 0xF8) | 0x04;
+  TCCR3B = (TCCR3B & 0xF8) | 0x04; // set to 120 hz
+  TCCR4B = (TCCR4B & 0xF8) | 0x04; // set to 120 hz
+  TCCR5B = (TCCR5B & 0xF8) | 0x04; // set to 120 hz
+
 
   systems[0].active = true;
 //  systems[1].active = true;

@@ -89,7 +89,7 @@ void PneumaticSystem::tick() {
     if (inflateVentil) {
       // set the status of the ventils
       // digitalWrite(inflatePin, inflateVentil);
-      unsigned int pwm = 140 + (goalPressure - _pressure) * 4;
+      unsigned int pwm = 145 + (goalPressure - _pressure) * 4;
       analogWrite(inflatePin, pwm);
       //      analogWrite(inflatePin, pwmPressure);
     } else {
@@ -105,8 +105,8 @@ void PneumaticSystem::tick() {
 void PneumaticSystem::setGoalPressure(const int _goalPressure) {
   goalPressure = _goalPressure;
   unsigned long _pressure = pressure >> 3;
-  highThreshold = goalPressure + 2;
-  lowThreshold = goalPressure - 2;
+  highThreshold = goalPressure + 1;
+  lowThreshold = goalPressure - 1;
   //  pwmPressure = 110 + (goalPressure - _pressure) * 5;
   isReaching = true;
   isPWM = false;
