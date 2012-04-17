@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$USER_HOME$/Documents/Processing/libraries/controlP5/ControlP5.iml" filepath="$USER_HOME$/Documents/Processing/libraries/controlP5/ControlP5.iml" />
       <module fileurl="file://$PROJECT_DIR$/processing/Processing.iml" filepath="$PROJECT_DIR$/processing/Processing.iml" />
-      <module fileurl="file://$PROJECT_DIR$/arduino/arduino.iml" filepath="$PROJECT_DIR$/arduino/arduino.iml" />
     </modules>
   </component>
 </project>

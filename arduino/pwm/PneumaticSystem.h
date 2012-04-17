@@ -6,13 +6,15 @@
 class PneumaticSystem {
 public:
   bool active;
-  int systemNumber; // number of system
-  int pressure; // current pressure of system
-  int goalPressure; // pressure that needs to be attained
-  int lowThreshold;
-  int highThreshold;
+  byte systemNumber; // number of system
+  unsigned long pressure; // current pressure of system
+  unsigned int goalPressure; // pressure that needs to be attained
+  unsigned int pwmPressure; // pwm pressure
+  unsigned int lowThreshold;
+  unsigned int highThreshold;
 
   bool isReaching; // are we currently inflating
+  bool isPWM;
   bool inflateVentil; // status of the inflate ventil
   bool deflateVentil; // status of the deflate ventil
 
@@ -26,6 +28,7 @@ public:
   void init();
   void tick();
   void setGoalPressure(const int _goalPressure);
+  void setPwmPressure(const int _pwmPressure);
   void printStatus();
   void printPressure();
   void printNumber(int number);

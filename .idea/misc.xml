@@ -18,6 +18,9 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
+  <component name="OfflineModuleManager">
+    <module path="$PROJECT_DIR$/arduino/arduino.iml" />
+  </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
       <profile-state>

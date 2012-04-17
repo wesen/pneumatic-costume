@@ -7,7 +7,7 @@ import processing.serial.Serial;
 import rwmidi.RWMidi;
 
 public class PneumaticSketch extends PApplet {
-  public final int P_REIFEN = 230;
+  public final int P_REIFEN = 220;
 
   PneumaticProtocolDecoder decoder;
   PneumaticSystem          systems[];

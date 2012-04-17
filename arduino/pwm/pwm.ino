@@ -26,12 +26,16 @@ void setup() {
 
   Serial.begin(115200);
 
+  TCCR3B = (TCCR3B & 0xF8) | 0x04;
+
   systems[0].active = true;
-  systems[1].active = true;
+//  systems[1].active = true;
 
   systems[0].printMessage("Booting up system");
   systems[1].printMessage("Booting up system");
 
+  systems[0].setGoalPressure(0);
+  systems[1].setGoalPressure(1);
 }
 
 static int cnt = 0;
