@@ -11,12 +11,12 @@ import rwmidi.MidiInput;
 import rwmidi.RWMidi;
 
 public class PneumaticMidiDispatcher {
-    MidiInput input;
-    private PneumaticSystem[] systems;
+  MidiInput input;
+  private PneumaticSystem[] systems;
 
-    public PneumaticMidiDispatcher(PneumaticSystem[] systems) {
-        this.systems = systems;
-    }
+  public PneumaticMidiDispatcher(PneumaticSystem[] systems) {
+    this.systems = systems;
+  }
 
   public void setPort(int value) {
     if (input != null) {
@@ -27,60 +27,43 @@ public class PneumaticMidiDispatcher {
   }
 
   enum SystemIds {
-        SYSTEM_1_ID,
-        SYSTEM_2_ID,
-        SYSTEM_3_ID,
-        SYSTEM_4_ID,
-        SYSTEM_5_ID,
-        SYSTEM_6_ID
+    SYSTEM_1_ID(0),
+    SYSTEM_2_ID(1),
+    SYSTEM_3_ID(2),
+    SYSTEM_4_ID(3),
+    SYSTEM_5_ID(4),
+    SYSTEM_6_ID(5);
+    public int idx;
+
+    SystemIds(int i) {
+      this.idx = i;
     }
+  }
 
-    static Map<Integer, EnumSet<SystemIds>> ccToSystems;
+  static Map<Integer, EnumSet<SystemIds>> ccToSystems;
 
-    static {
-        ccToSystems = new HashMap<Integer, EnumSet<SystemIds>>();
-    }
+  static {
+    ccToSystems = new HashMap<Integer, EnumSet<SystemIds>>();
+    ccToSystems.put(5, EnumSet.of(SystemIds.SYSTEM_1_ID));
+    ccToSystems.put(6, EnumSet.of(SystemIds.SYSTEM_2_ID));
+    ccToSystems.put(7, EnumSet.of(SystemIds.SYSTEM_3_ID));
+    ccToSystems.put(8, EnumSet.of(SystemIds.SYSTEM_4_ID));
+    ccToSystems.put(9, EnumSet.of(SystemIds.SYSTEM_5_ID));
+    ccToSystems.put(10, EnumSet.of(SystemIds.SYSTEM_6_ID));
 
-    /**
-     *
-     * CC 5 = System 1
-     * CC 6 = System 2
-     * CC 7 = System 3
-     * CC 8 = System 4
-     * CC 9 = System 5
-     * CC 10 = System 6
-     *
-     * CC 11 = System 1 + 2
-     * CC 12 = System 1 + 3
-     * CC 13 = System 1 + 4
-     * CC 14 = System 1 + 5
-     * CC 15 = System 1 + 6
-     *
-     * CC 16 = System 2 + 3
-     * CC 17 = System 2 + 4
-     * CC 18 = System 2 + 5
-     * CC 19 = System 2 + 6
-     *
-     * CC 20 = System 3 + 4
-     * CC 21 = System 3 + 5
-     * CC 22 = System 3 + 6
-     *
-     * CC 23 = System 4 + 5
-     * CC 24 = System 4 + 6
-     *
-     * CC 25 = System 5 + 6
-     *
-     **/
-    void controllerChangeReceived(rwmidi.Controller cc) {
-        int _cc = cc.getCC();
-        if (_cc < 5) {
-            return;
+    ccToSystems.put(11, EnumSet.of(SystemIds.SYSTEM_1_ID, SystemIds.SYSTEM_2_ID));
+  }
+
+  void controllerChangeReceived(rwmidi.Controller cc) {
+    int _cc = cc.getCC();
+
+    if (ccToSystems.containsKey(_cc)) {
+      int _val = cc.getValue();
+      for (SystemIds id : ccToSystems.get(_cc)) {
+        if (id.idx < systems.length) {
+          systems[id.idx].setPressure((int) (PApplet.map(_val, 0, 127, PneumaticSystem.P_ATMOSPHERE, systems[id.idx].maxPressure)));
         }
-        int _val = cc.getValue();
-        int _system = _cc - 5;
-        if (_system < systems.length) {
-            systems[_system].setPressure((int)(PApplet.map(_val, 0, 127, PneumaticSystem.P_ATMOSPHERE, systems[_system].maxPressure)));
-        }
+      }
     }
-
+  }
 }

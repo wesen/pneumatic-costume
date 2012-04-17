@@ -80,7 +80,7 @@ public class PneumaticSketch extends PApplet {
         midiDispatcher.setPort((int)group.value());
       } else if (group.name().equals("serial-list")) {
         if (serial != null) {
-          serial.clear();
+          serial.dispose();
           serial = null;
         }
 

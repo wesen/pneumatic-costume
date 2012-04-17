@@ -10,7 +10,11 @@
   <component name="CopyrightManager" default="">
     <module2copyright />
   </component>
-  <component name="CppTools.Loader" reportImplicitCastToBool="false" reportNameReferencedOnce="false" version="3" compilerSelect="AUTO" />
+  <component name="CppTools.Loader" reportImplicitCastToBool="false" reportNameReferencedOnce="false" warnedAboutFileOutOfSourceRoot="true" version="3" additionalPreprocessorDefs="" compilerSelect="GCC">
+    <include-dir path="/Applications/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr/include" />
+    <include-dir path="/Applications/Arduino.app/Contents/Resources/Java/hardware/tools/avr/include" />
+    <include-dir path="/Applications/Arduino.app/Contents/Resources/Java/hardware/arduino/cores/arduino" />
+  </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
