@@ -54,7 +54,7 @@ public class PneumaticMidiDispatcher {
     ccToSystems.put(11, EnumSet.of(SystemIds.SYSTEM_1_ID, SystemIds.SYSTEM_2_ID));
   }
 
-  void controllerChangeReceived(rwmidi.Controller cc) {
+  public void controllerChangeReceived(rwmidi.Controller cc) {
     int _cc = cc.getCC();
 
     if (ccToSystems.containsKey(_cc)) {

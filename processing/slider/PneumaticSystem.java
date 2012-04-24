@@ -33,7 +33,7 @@ class PneumaticSystem {
     name = _name;
     maxPressure = _maxPressure;
 
-    xPos = LEFT + 140;
+    xPos = LEFT + 80;
     height = 130;
 
     prevPressure = 0;
@@ -46,12 +46,12 @@ class PneumaticSystem {
     slider.snapToTickMarks(false);
     slider.setDecimalPrecision(0);
 
-    pwmSlider = controlP5.addSlider(name, 0, 127, LEFT + 80, 30 + number * height, 20, 100);
-    pwmSlider.setSliderMode(Slider.FLEXIBLE);
-    pwmSlider.setNumberOfTickMarks(21);
-    pwmSlider.showTickMarks(true);
-    pwmSlider.snapToTickMarks(false);
-    pwmSlider.setDecimalPrecision(0);
+//    pwmSlider = controlP5.addSlider(name, 0, 127, LEFT + 80, 30 + number * height, 20, 100);
+//    pwmSlider.setSliderMode(Slider.FLEXIBLE);
+//    pwmSlider.setNumberOfTickMarks(21);
+//    pwmSlider.showTickMarks(true);
+//    pwmSlider.snapToTickMarks(false);
+//    pwmSlider.setDecimalPrecision(0);
 
     top = 20 + number * height;
     bottom = 140 + number * height;
@@ -68,12 +68,12 @@ class PneumaticSystem {
       prevPressure = pressure;
     }
 
-    int pwmPressure = applet.round(pwmSlider.value());
-    if (pwmPressure != prevPwmPressure) {
-      setPwmPressure(pwmPressure);
-      applet.println("pwm: " + pwmPressure);
-      prevPwmPressure = pwmPressure;
-    }
+//    int pwmPressure = applet.round(pwmSlider.value());
+//    if (pwmPressure != prevPwmPressure) {
+//      setPwmPressure(pwmPressure);
+//      applet.println("pwm: " + pwmPressure);
+//      prevPwmPressure = pwmPressure;
+//    }
   }
 
   private void setPwmPressure(int pwmPressure) {
@@ -112,7 +112,7 @@ class PneumaticSystem {
 
     // at the edge of the screen, go back to the beginning:
     if (xPos >= applet.width) {
-      xPos = LEFT + 140;
+      xPos = LEFT + 80;
       applet.rect(xPos, top, applet.width, height);
     } else {
       // increment the horizontal position:
