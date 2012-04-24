@@ -13,11 +13,12 @@
 // PneumaticSystem(number, inflatePin, deflatePin, analog input);
 // Make sure that the inflatePin is one of 2, 3, 5, 6, 7, 8, 44, 45, 46 as these
 // use tweaked PWM timers
-PneumaticSystem systems[4] = {
+PneumaticSystem systems[5] = {
   PneumaticSystem(0, 2, 3, A0),
   PneumaticSystem(1, 5, 6, A1),
   PneumaticSystem(2, 7, 8, A2),
-  PneumaticSystem(3, 9, 10, A3)
+  PneumaticSystem(3, 9, 10, A3),
+  PneumaticSystem(4, 11, 12, A4)
 };
 
 PneumaticProtocolDecoder decoder;
@@ -35,13 +36,20 @@ void setup() {
   TCCR5B = (TCCR5B & 0xF8) | 0x04; // set to 120 hz
 
   systems[0].active = true;
-  systems[1].active = true;
-
-  systems[0].printMessage("Booting up system");
-  systems[1].printMessage("Booting up system");
-
   systems[0].setGoalPressure(0);
-  systems[1].setGoalPressure(1);
+
+  systems[1].active = true;
+  systems[1].setGoalPressure(0);
+
+  systems[2].active = true;
+  systems[2].setGoalPressure(0);
+
+  systems[3].active = true;
+  systems[3].setGoalPressure(0);
+
+  systems[4].active = true;
+  systems[4].setGoalPressure(0);
+
 }
 
 static int cnt = 0;
