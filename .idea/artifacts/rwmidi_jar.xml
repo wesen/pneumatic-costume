@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact name="rwmidi:jar">
+    <output-path>$USER_HOME$/Documents/Processing/libraries/rwmidi/library</output-path>
+    <root id="root">
+      <element id="archive" name="rwmidi.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/../rwmidi/src/rwmidi/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="rwmidi" />
+      </element>
+    </root>
+  </artifact>
+</component>
