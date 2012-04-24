@@ -26,8 +26,9 @@ public class PneumaticSketch extends PApplet {
 
   public void setup() {
     // Draw the GUI window
-    parent.size(880, 700);
+    parent.size(880, 820);
     parent.background(0);
+    parent.frameRate(20);
 
     ControlP5 controlP5 = new ControlP5(parent);
     serialList = controlP5.addDropdownList("serial-list", 20, 20, 150, 120);
@@ -49,13 +50,14 @@ public class PneumaticSketch extends PApplet {
     // Add additional systems here, adjust the total number of systems
     // for example:
     // systems = new PneumaticSystem[4];
-    systems = new PneumaticSystem[5];
+    systems = new PneumaticSystem[6];
 
     systems[0] = new PneumaticSystem(parent, controlP5, serial, "ARME", 0, P_REIFEN);
     systems[1] = new PneumaticSystem(parent, controlP5, serial, "KIEMEN", 1, P_REIFEN);
     systems[2] = new PneumaticSystem(parent, controlP5, serial, "ROCK1", 2, P_REIFEN);
     systems[3] = new PneumaticSystem(parent, controlP5, serial, "ROCK2", 3, P_REIFEN);
-    systems[4] = new PneumaticSystem(parent, controlP5, serial, "BLABLA", 4, P_REIFEN);
+    systems[4] = new PneumaticSystem(parent, controlP5, serial, "ROCK3", 4, P_REIFEN);
+    systems[5] = new PneumaticSystem(parent, controlP5, serial, "ROCK4", 5, P_REIFEN);
 
     decoder = new PneumaticProtocolDecoder(new PneumaticCommandDispatcher(systems));
     midiDispatcher = new PneumaticMidiDispatcher(systems);

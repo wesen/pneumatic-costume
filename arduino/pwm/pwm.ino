@@ -13,12 +13,13 @@
 // PneumaticSystem(number, inflatePin, deflatePin, analog input);
 // Make sure that the inflatePin is one of 2, 3, 5, 6, 7, 8, 44, 45, 46 as these
 // use tweaked PWM timers
-PneumaticSystem systems[5] = {
-  PneumaticSystem(0, 2, 3, A0),
-  PneumaticSystem(1, 5, 6, A1),
-  PneumaticSystem(2, 7, 8, A2),
-  PneumaticSystem(3, 9, 10, A3),
-  PneumaticSystem(4, 11, 12, A4)
+PneumaticSystem systems[6] = {
+  PneumaticSystem(0, 2, 4, A0),
+  PneumaticSystem(1, 3, 9, A1),
+  PneumaticSystem(2, 5, 10, A2),
+  PneumaticSystem(3, 6, 11, A3),
+  PneumaticSystem(4, 7, 12, A4),
+  PneumaticSystem(5, 8, 13, A5)
 };
 
 PneumaticProtocolDecoder decoder;
@@ -50,6 +51,8 @@ void setup() {
   systems[4].active = true;
   systems[4].setGoalPressure(0);
 
+  systems[5].active = true;
+  systems[5].setGoalPressure(0);
 }
 
 static int cnt = 0;
