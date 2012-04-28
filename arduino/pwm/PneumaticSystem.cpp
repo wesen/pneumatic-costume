@@ -1,4 +1,5 @@
 #include "PneumaticSystem.h"
+#include <Arduino.h>
 
 void PneumaticSystem::init() {
   // control for input ventil (pump air into system)
@@ -7,6 +8,8 @@ void PneumaticSystem::init() {
   pinMode(deflatePin, OUTPUT);
   // pressure sensor analog input
   pinMode(pressurePin, INPUT);
+
+  lastInflate = 0;
 
   digitalWrite(inflatePin, false);
   digitalWrite(deflatePin, false);
@@ -36,10 +39,10 @@ void PneumaticSystem::tick() {
     return;
   } else {
     /*
-    printMessage("pressure ");
-    printNumber(pressure >> 3);
-    printMessage("new pressure");
-    printNumber(newPressure);
+      printMessage("pressure ");
+      printNumber(pressure >> 3);
+      printMessage("new pressure");
+      printNumber(newPressure);
     */
   }
   newPressure <<= 3;
@@ -54,71 +57,70 @@ void PneumaticSystem::tick() {
     return;
   }
 
-  if (isPWM) {
-    if (pwmPressure >= 64) {
-      digitalWrite(deflatePin, false);
-      analogWrite(inflatePin, (pwmPressure - 64) * 4);
-    } else {
-      digitalWrite(inflatePin, false);
-      analogWrite(deflatePin, (63 - pwmPressure) * 4);
+  if (millis() < (lastInflate + 200)) {
+    if (systemNumber == 2) {
+      printMessage("safety buffer");
+      printNumber(millis() - lastInflate);
+    }
+    return;
+  }
+
+ again:
+  if (isReaching) {
+    if (_pressure == goalPressure) {
+      isReaching = false;
+      inflateVentil = false;
+      deflateVentil = false;
+    } else if (_pressure < goalPressure) {
+      inflateVentil = true;
+      deflateVentil = false;
+    } else if (_pressure > goalPressure) {
+      inflateVentil = false;
+      deflateVentil = true;
     }
   } else {
-  again:
-    if (isReaching) {
-      if (_pressure == goalPressure) {
-        isReaching = false;
-        inflateVentil = false;
-        deflateVentil = false;
-      } else if (_pressure < goalPressure) {
-        inflateVentil = true;
-        deflateVentil = false;
-      } else if (_pressure > goalPressure) {
-        inflateVentil = false;
-        deflateVentil = true;
-      }
-    } else {
-      /*
+    /*
       printMessage("low, high, _pressure");
       printNumber(lowThreshold);
       printNumber(highThreshold);
       printNumber(_pressure);
-      */
-      if (_pressure < lowThreshold || _pressure > highThreshold) {
-        printMessage("adjust");
-        isReaching = true;
-        goto again;
-      }
-    }
-
-    if (inflateVentil) {
-      //      if (systemNumber == 2)
-      //        printMessage("inflate");
-
-      // set the status of the ventils
-      // digitalWrite(inflatePin, inflateVentil);
-      unsigned int pwm = (145 + (goalPressure - _pressure) * 4) * 4;
-      printNumber(pwm);
-      analogWrite(inflatePin, pwm);
-      //      digitalWrite(inflatePin, true);
-      //      analogWrite(inflatePin, pwmPressure);
-    } else {
-      //      if (systemNumber == 2)
-      //      printMessage("no inflate");
-      digitalWrite(inflatePin, false);
-    }
-
-    /*
-    if (deflatePin) {
-      if (systemNumber == 2)
-      printMessage("deflate");
-    } else {
-      if (systemNumber == 2)
-      printMessage("no deflate");
-    }
     */
-
-    digitalWrite(deflatePin, deflateVentil);
+    if (_pressure < lowThreshold || _pressure > highThreshold) {
+      printMessage("adjust");
+      isReaching = true;
+      goto again;
+    }
   }
+
+  if (inflateVentil) {
+    //      if (systemNumber == 2)
+    //        printMessage("inflate");
+
+    // set the status of the ventils
+    // digitalWrite(inflatePin, inflateVentil);
+    unsigned int pwm = (145 + (goalPressure - _pressure) * 4) * 4;
+    printNumber(pwm);
+    //      analogWrite(inflatePin, pwm);
+    digitalWrite(inflatePin, true);
+    lastInflate = millis();
+    //      analogWrite(inflatePin, pwmPressure);
+  } else {
+    //      if (systemNumber == 2)
+    //      printMessage("no inflate");
+    digitalWrite(inflatePin, false);
+  }
+
+  /*
+    if (deflatePin) {
+    if (systemNumber == 2)
+    printMessage("deflate");
+    } else {
+    if (systemNumber == 2)
+    printMessage("no deflate");
+    }
+  */
+
+  digitalWrite(deflatePin, deflateVentil);
 }
 
 /**
@@ -131,12 +133,10 @@ void PneumaticSystem::setGoalPressure(const int _goalPressure) {
   lowThreshold = goalPressure - 1;
   //  pwmPressure = 110 + (goalPressure - _pressure) * 5;
   isReaching = true;
-  isPWM = false;
 }
 
 void PneumaticSystem::setPwmPressure(const int _pwmPressure) {
   pwmPressure = _pwmPressure;
-  //  isPWM = true;
 }
 
 void PneumaticSystem::debugStatus() {

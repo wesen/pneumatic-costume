@@ -13,8 +13,9 @@ public:
   unsigned int lowThreshold;
   unsigned int highThreshold;
 
+  unsigned long lastInflate;
+
   bool isReaching; // are we currently inflating
-  bool isPWM;
   bool inflateVentil; // status of the inflate ventil
   bool deflateVentil; // status of the deflate ventil
 
