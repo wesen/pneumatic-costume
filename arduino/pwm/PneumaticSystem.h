@@ -37,7 +37,7 @@ public:
 };
 
 
-extern PneumaticSystem systems[4];
+extern PneumaticSystem systems[6];
 
 
 

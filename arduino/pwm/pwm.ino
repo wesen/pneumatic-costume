@@ -26,15 +26,20 @@ PneumaticProtocolDecoder decoder;
 
 
 void setup() {
-  for (byte i = 0; i < countof(systems); i++) {
-    systems[i].init();
-  }
+  TCCR3A = (TCCR3A & 0xFC) | 0x03; // set to 9 bit
+  TCCR4A = (TCCR4A & 0xFC) | 0x03; // set to 9 bit
+  TCCR5A = (TCCR5A & 0xFC) | 0x03; // set to 9 bit
+
+  TCCR3B = (TCCR3B & 0xF8) | 0x03; // set to 120 hz
+  TCCR4B = (TCCR4B & 0xF8) | 0x03; // set to 120 hz
+  TCCR5B = (TCCR5B & 0xF8) | 0x03; // set to 120 hz
+
 
   Serial.begin(115200);
 
-  TCCR3B = (TCCR3B & 0xF8) | 0x04; // set to 120 hz
-  TCCR4B = (TCCR4B & 0xF8) | 0x04; // set to 120 hz
-  TCCR5B = (TCCR5B & 0xF8) | 0x04; // set to 120 hz
+  for (int i = 0; i < countof(systems); i++) {
+    systems[i].init();
+  }
 
   systems[0].active = true;
   systems[0].setGoalPressure(0);

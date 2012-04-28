@@ -59,7 +59,7 @@ class PneumaticSystem {
 
   public void draw() {
     applet.fill(0);
-    applet.rect(LEFT, top, 140, height);
+    applet.rect(LEFT, top, 80, height);
 
     int pressure = applet.round(slider.value());
     if (pressure != prevPressure) {

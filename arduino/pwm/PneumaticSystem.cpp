@@ -8,6 +8,9 @@ void PneumaticSystem::init() {
   // pressure sensor analog input
   pinMode(pressurePin, INPUT);
 
+  digitalWrite(inflatePin, false);
+  digitalWrite(deflatePin, false);
+
   goalPressure = pressure = analogRead(pressurePin);
   lowThreshold = goalPressure - 3;
   highThreshold = goalPressure;
@@ -88,14 +91,32 @@ void PneumaticSystem::tick() {
     }
 
     if (inflateVentil) {
+      //      if (systemNumber == 2)
+      //        printMessage("inflate");
+
       // set the status of the ventils
       // digitalWrite(inflatePin, inflateVentil);
-      unsigned int pwm = 145 + (goalPressure - _pressure) * 4;
+      unsigned int pwm = (145 + (goalPressure - _pressure) * 4) * 4;
+      printNumber(pwm);
       analogWrite(inflatePin, pwm);
+      //      digitalWrite(inflatePin, true);
       //      analogWrite(inflatePin, pwmPressure);
     } else {
+      //      if (systemNumber == 2)
+      //      printMessage("no inflate");
       digitalWrite(inflatePin, false);
     }
+
+    /*
+    if (deflatePin) {
+      if (systemNumber == 2)
+      printMessage("deflate");
+    } else {
+      if (systemNumber == 2)
+      printMessage("no deflate");
+    }
+    */
+
     digitalWrite(deflatePin, deflateVentil);
   }
 }
