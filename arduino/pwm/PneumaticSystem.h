@@ -13,7 +13,9 @@ public:
   unsigned int lowThreshold;
   unsigned int highThreshold;
 
-  unsigned long lastInflate;
+  unsigned long startRamp;
+
+  bool safetyTime;
 
   bool isReaching; // are we currently inflating
   bool inflateVentil; // status of the inflate ventil

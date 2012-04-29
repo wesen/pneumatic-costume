@@ -53,7 +53,7 @@ public class PneumaticSketch extends PApplet {
     systems = new PneumaticSystem[6];
 
     systems[0] = new PneumaticSystem(parent, controlP5, serial, "ARME", 0, P_REIFEN);
-    systems[1] = new PneumaticSystem(parent, controlP5, serial, "KIEMEN", 1, P_REIFEN);
+    systems[1] = new PneumaticSystem(parent, controlP5, serial, "KIEMEN", 1, 200);
     systems[2] = new PneumaticSystem(parent, controlP5, serial, "ROCK1", 2, P_REIFEN);
     systems[3] = new PneumaticSystem(parent, controlP5, serial, "ROCK2", 3, P_REIFEN);
     systems[4] = new PneumaticSystem(parent, controlP5, serial, "ROCK3", 4, P_REIFEN);

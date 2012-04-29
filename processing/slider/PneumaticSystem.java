@@ -3,7 +3,7 @@ import processing.serial.*;
 import controlP5.*;
 
 class PneumaticSystem {
-  public static final int P_ATMOSPHERE = 199;
+  public static final int P_ATMOSPHERE = 190;
 
   public int    number;
   public int    maxPressure;
@@ -125,7 +125,7 @@ class PneumaticSystem {
   }
 
   public void printMessage(String message) {
-    System.out.println("system " + number + " debug: " + message);
+  System.out.println("system " + number + " debug: " + message);
   }
 
   public void printStatus(boolean isRising, boolean inflateVentil, boolean deflateVentil) {
